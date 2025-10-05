@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convolution Graphical Method</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8px;
+            background: #f5f5f5;
+            overflow-x: hidden;
+            font-size: 13px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.1em;
+            margin: 8px 0;
+        }
+        .setup-container {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .setup-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            margin: 8px 0;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #555;
+            font-size: 0.85em;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 6px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #2196f3;
+            font-size: 0.8em;
+        }
+        .step-container {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .step-title {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        .step-desc {
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        .graph-wrapper {
+            overflow-x: hidden;
+            overflow-y: visible;
+            margin: 10px 0;
+        }
+        .graph {
+            position: relative;
+            height: 140px;
+            margin: 15px 0;
+            width: 100%;
+        }
+        .graph-title {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .axis {
+            position: absolute;
+            background: #333;
+        }
+        .axis-x {
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+        .axis-y {
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            height: 140px;
+            background: #ff9800;
+            z-index: 5;
+        }
+        .axis-y-label {
+            position: absolute;
+            bottom: -18px;
+            left: -8px;
+            color: #ff9800;
+            font-weight: bold;
+            font-size: 0.75em;
+        }
+        .stem {
+            position: absolute;
+            width: 2px;
+            background: #2196f3;
+            bottom: 70px;
+            z-index: 3;
+        }
+        .stem.flipped {
+            background: #f44336;
+        }
+        .stem.result {
+            background: #4caf50;
+        }
+        .impulse {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2196f3;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+        }
+        .impulse.flipped {
+            background: #f44336;
+        }
+        .impulse.result {
+            background: #4caf50;
+        }
+        .tick {
+            position: absolute;
+            width: 1px;
+            height: 6px;
+            background: #666;
+            bottom: 67px;
+        }
+        .tick-label {
+            position: absolute;
+            bottom: 53px;
+            font-size: 0.7em;
+            color: #666;
+            transform: translateX(-50%);
+        }
+        .impulse-value {
+            position: absolute;
+            font-size: 0.7em;
+            font-weight: bold;
+            color: #333;
+            transform: translateX(-50%);
+        }
+        .calculation {
+            background: #fff3e0;
+            padding: 6px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+        }
+        .result-box {
+            background: #c8e6c9;
+            padding: 6px;
+            border-radius: 4px;
+            margin-top: 8px;
+            border-left: 3px solid #4caf50;
+            font-size: 0.75em;
+        }
+        .controls {
+            text-align: center;
+            margin: 10px 0;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 3px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        button.start-btn {
+            background: #4caf50;
+            padding: 10px 20px;
+        }
+        .highlight {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Convolution Graphical Method</h1>
+    
+    <div id="setupSection" class="setup-container">
+        <div class="setup-title">Configure Your Signals</div>
+        
+        <div class="input-group">
+            <label>First Signal x[n] (comma-separated):</label>
+            <input type="text" id="signal1" value="1,2,1,2">
+        </div>
+        
+        <div class="input-group">
+            <label>First Signal Starting Index (n₁):</label>
+            <input type="number" id="start1" value="0">
+        </div>
+        
+        <div class="input-group">
+            <label>Second Signal h[n] (comma-separated):</label>
+            <input type="text" id="signal2" value="1,2,1,2">
+        </div>
+        
+        <div class="input-group">
+            <label>Second Signal Starting Index (n₂):</label>
+            <input type="number" id="start2" value="0">
+        </div>
+        
+        <div class="info-box">
+            <strong>Note:</strong> Starting index determines which sample is at n=0 on the axis origin.<br>
+            Example: If start=-1, then first sample is at n=-1, second at n=0, etc.
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+            <button class="start-btn" onclick="startConvolution()">Start Convolution</button>
+        </div>
+    </div>
+
+    <div id="demoSection" class="hidden">
+        <div class="info-box" id="signalInfo"></div>
+        
+        <div class="controls">
+            <button id="prevBtn" onclick="changeStep(-1)">← Prev</button>
+            <button id="nextBtn" onclick="changeStep(1)">Next →</button>
+            <button onclick="resetDemo()">Reset</button>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let steps = [];
+        let sig1 = [], sig2 = [], start1 = 0, start2 = 0;
+        let globalFixedRange = null;
+
+        function parseSignal(str) {
+            return str.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+        }
+
+        function startConvolution() {
+            sig1 = parseSignal(document.getElementById('signal1').value);
+            sig2 = parseSignal(document.getElementById('signal2').value);
+            start1 = parseInt(document.getElementById('start1').value) || 0;
+            start2 = parseInt(document.getElementById('start2').value) || 0;
+
+            if (sig1.length === 0 || sig2.length === 0) {
+                alert('Please enter valid signals!');
+                return;
+            }
+
+            generateSteps();
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('demoSection').classList.remove('hidden');
+            
+            const info = document.getElementById('signalInfo');
+            const outputLength = sig1.length + sig2.length - 1;
+            const outputStart = start1 + start2;
+            const outputEnd = outputStart + outputLength - 1;
+            
+            info.innerHTML = `
+                <strong>x[n]:</strong> {${sig1.join(', ')}} starting at n=${start1}<br>
+                <strong>h[n]:</strong> {${sig2.join(', ')}} starting at n=${start2}<br>
+                <strong>Output:</strong> ${outputLength} samples from n=${outputStart} to n=${outputEnd}
+            `;
+            
+            renderStep(0);
+        }
+
+        function generateSteps() {
+            steps = [];
+            const N1 = sig1.length;
+            const N2 = sig2.length;
+            const outputStart = start1 + start2;
+            const outputLength = N1 + N2 - 1;
+
+            const allIndices = [];
+            for (let i = 0; i < N1; i++) allIndices.push(start1 + i);
+            for (let i = 0; i < N2; i++) allIndices.push(start2 + i);
+            for (let i = 0; i < N2; i++) allIndices.push(-start2 - i);
+            for (let n = 0; n < outputLength; n++) {
+                const currentN = outputStart + n;
+                for (let i = 0; i < N2; i++) {
+                    allIndices.push(currentN + start2 - i);
+                }
+            }
+            for (let i = 0; i < outputLength; i++) {
+                allIndices.push(outputStart + i);
+            }
+            
+            const minIdx = Math.min(...allIndices);
+            const maxIdx = Math.max(...allIndices);
+            const range = Math.max(Math.abs(minIdx), Math.abs(maxIdx)) + 3;
+            globalFixedRange = { min: -range, max: range };
+
+            steps.push({
+                title: "Step 0: Original Signals",
+                description: `x[n] has n=0 at index ${-start1}, h[n] has n=0 at index ${-start2}`,
+                graphs: [
+                    {
+                        title: "x[n] (blue)",
+                        bars: sig1.map((v, i) => ({n: start1 + i, val: v})),
+                        type: 'original'
+                    },
+                    {
+                        title: "h[n] (blue)",
+                        bars: sig2.map((v, i) => ({n: start2 + i, val: v})),
+                        type: 'original'
+                    }
+                ]
+            });
+
+            const flippedSig2 = [...sig2].reverse();
+            const flippedStart = -start2;
+            const flippedEnd = -start2 - (N2 - 1);
+            steps.push({
+                title: "Step 1: Flip h[k] → h[-k]",
+                description: `Flipping reverses the signal around n=0 axis. Watch how the signal mirrors.`,
+                graphs: [
+                    {
+                        title: "h[k] (blue - original)",
+                        bars: sig2.map((v, i) => ({n: start2 + i, val: v})),
+                        type: 'original'
+                    },
+                    {
+                        title: "h[-k] (red - flipped)",
+                        bars: flippedSig2.map((v, i) => ({n: -start2 - i, val: v})),
+                        type: 'flipped'
+                    }
+                ],
+                calculation: `Original h[n] spans: n=${start2} to n=${start2 + N2 - 1}<br>` +
+                           `After flipping h[-k], it spans: k=${flippedStart} to k=${flippedEnd}<br>` +
+                           `<strong>Rule:</strong> If h[n] goes from a to b, then h[-k] goes from -a to -b`
+            });
+
+            const result = [];
+            
+            // Add Step 2 showing initial alignment before convolution
+            const initialShiftedH = flippedSig2.map((v, i) => ({
+                n: outputStart + start2 - i,
+                val: v
+            }));
+            
+            steps.push({
+                title: `Step 2: Position h[-k] for First Output`,
+                description: `The flipped signal h[-k] (from Step 1) now shifts to align for n=${outputStart}.<br>` +
+                           `<strong>Initial shift position = n₁ + n₂ = ${start1} + ${start2} = ${outputStart}</strong><br>` +
+                           `This varies based on where your signals start - NOT always at -1!`,
+                graphs: [
+                    {
+                        title: "h[-k] (red - before shifting)",
+                        bars: flippedSig2.map((v, i) => ({n: -start2 - i, val: v})),
+                        type: 'flipped'
+                    },
+                    {
+                        title: `h[${outputStart}-k] (red - after shifting to n=${outputStart})`,
+                        bars: initialShiftedH,
+                        type: 'flipped'
+                    }
+                ],
+                calculation: `Starting position for convolution:<br>` +
+                           `Output begins at n = n₁ + n₂ = ${start1} + ${start2} = ${outputStart}<br>` +
+                           `The flipped signal shifts so we can compute y[${outputStart}]`
+            });
+            
+            for (let n = 0; n < outputLength; n++) {
+                const currentN = outputStart + n;
+                let sum = 0;
+                let calcText = [];
+
+                for (let k = 0; k < N1; k++) {
+                    const k_idx = start1 + k;
+                    const h_idx = currentN - k_idx;
+                    const h_original_idx = h_idx - start2;
+                    
+                    if (h_original_idx >= 0 && h_original_idx < N2) {
+                        const x_val = sig1[k];
+                        const h_val = sig2[h_original_idx];
+                        sum += x_val * h_val;
+                        calcText.push(`x[${k_idx}]·h[${h_idx}]=${x_val}·${h_val}`);
+                    }
+                }
+
+                result.push(sum);
+
+                const shiftedH = flippedSig2.map((v, i) => ({
+                    n: currentN + start2 - i,
+                    val: v
+                }));
+
+                steps.push({
+                    title: `Step ${n + 3}: n=${currentN}`,
+                    description: `Shift h[-k] to h[${currentN}-k], origin at n=${currentN}`,
+                    graphs: [
+                        {
+                            title: "x[k] (blue)",
+                            bars: sig1.map((v, i) => ({n: start1 + i, val: v})),
+                            type: 'original'
+                        },
+                        {
+                            title: `h[${currentN}-k] (red)`,
+                            bars: shiftedH,
+                            type: 'flipped'
+                        }
+                    ],
+                    calculation: calcText.length > 0 ? 
+                        `y[${currentN}] = ${calcText.join(' + ')} = <span class='highlight'>${sum}</span>` :
+                        `y[${currentN}] = <span class='highlight'>0</span> (no overlap)`,
+                    result: `y[${currentN}] = ${sum}`
+                });
+            }
+
+            steps.push({
+                title: "Final Result",
+                description: `Complete convolution y[n] = x[n] * h[n]`,
+                graphs: [{
+                    bars: result.map((v, i) => ({n: outputStart + i, val: v})),
+                    type: 'result'
+                }],
+                result: `y[n] = {${result.join(', ')}} for n=${outputStart} to ${outputStart + outputLength - 1}`
+            });
+        }
+
+        function renderGraph(graph, container, globalRange) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'graph-wrapper';
+            
+            if (graph.title) {
+                const title = document.createElement('div');
+                title.className = 'graph-title';
+                title.textContent = graph.title;
+                wrapper.appendChild(title);
+            }
+
+            const graphDiv = document.createElement('div');
+            graphDiv.className = 'graph';
+
+            const minN = globalRange.min;
+            const maxN = globalRange.max;
+            const range = maxN - minN + 1;
+            
+            const viewportWidth = Math.min(window.innerWidth - 30, 1170);
+            const spacing = viewportWidth / (range + 1);
+
+            // X-axis
+            const axisX = document.createElement('div');
+            axisX.className = 'axis axis-x';
+            graphDiv.appendChild(axisX);
+
+            // Y-axis at n=0
+            const axisY = document.createElement('div');
+            axisY.className = 'axis axis-y';
+            axisY.style.left = ((0 - minN) * spacing + spacing/2) + 'px';
+            const yLabel = document.createElement('div');
+            yLabel.className = 'axis-y-label';
+            yLabel.textContent = 'n=0';
+            axisY.appendChild(yLabel);
+            graphDiv.appendChild(axisY);
+
+            // Draw ticks
+            for (let i = minN; i <= maxN; i++) {
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.left = ((i - minN) * spacing + spacing/2) + 'px';
+                graphDiv.appendChild(tick);
+
+                const tickLabel = document.createElement('div');
+                tickLabel.className = 'tick-label';
+                tickLabel.textContent = i;
+                tickLabel.style.left = ((i - minN) * spacing + spacing/2) + 'px';
+                graphDiv.appendChild(tickLabel);
+            }
+
+            const maxVal = globalRange.maxVal;
+
+            graph.bars.forEach(bar => {
+                const x = (bar.n - minN) * spacing + spacing/2;
+                const height = Math.abs(bar.val) * (50 / maxVal);
+                
+                // Stem
+                const stem = document.createElement('div');
+                stem.className = 'stem ' + graph.type;
+                stem.style.left = (x - 1) + 'px';
+                stem.style.height = height + 'px';
+                if (bar.val >= 0) {
+                    stem.style.bottom = '70px';
+                } else {
+                    stem.style.bottom = (70 - height) + 'px';
+                }
+                graphDiv.appendChild(stem);
+
+                // Impulse dot
+                const impulse = document.createElement('div');
+                impulse.className = 'impulse ' + graph.type;
+                impulse.style.left = x + 'px';
+                if (bar.val >= 0) {
+                    impulse.style.bottom = (70 + height) + 'px';
+                } else {
+                    impulse.style.bottom = (70 - height) + 'px';
+                }
+                graphDiv.appendChild(impulse);
+
+                // Value label
+                const value = document.createElement('div');
+                value.className = 'impulse-value';
+                value.textContent = bar.val;
+                value.style.left = x + 'px';
+                if (bar.val >= 0) {
+                    value.style.bottom = (70 + height + 10) + 'px';
+                } else {
+                    value.style.bottom = (70 - height - 15) + 'px';
+                }
+                graphDiv.appendChild(value);
+            });
+
+            wrapper.appendChild(graphDiv);
+            container.appendChild(wrapper);
+        }
+
+        function renderStep(stepIndex) {
+            const step = steps[stepIndex];
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step-container';
+
+            const title = document.createElement('div');
+            title.className = 'step-title';
+            title.textContent = step.title;
+            stepDiv.appendChild(title);
+
+            const desc = document.createElement('div');
+            desc.className = 'step-desc';
+            desc.innerHTML = step.description;
+            stepDiv.appendChild(desc);
+
+            let allBars = [];
+            step.graphs.forEach(g => allBars = allBars.concat(g.bars));
+            
+            let minN, maxN;
+            if (stepIndex === 0) {
+                minN = Math.min(...allBars.map(b => b.n)) - 2;
+                maxN = Math.max(...allBars.map(b => b.n)) + 2;
+            } else {
+                minN = globalFixedRange.min;
+                maxN = globalFixedRange.max;
+            }
+            
+            const maxVal = Math.max(...allBars.map(b => Math.abs(b.val)));
+            const globalRange = { min: minN, max: maxN, maxVal: maxVal };
+
+            step.graphs.forEach(graph => {
+                renderGraph(graph, stepDiv, globalRange);
+            });
+
+            if (step.calculation) {
+                const calc = document.createElement('div');
+                calc.className = 'calculation';
+                calc.innerHTML = '<strong>Calculation:</strong> ' + step.calculation;
+                stepDiv.appendChild(calc);
+            }
+
+            if (step.result) {
+                const result = document.createElement('div');
+                result.className = 'result-box';
+                result.innerHTML = '<strong>Result:</strong> ' + step.result;
+                stepDiv.appendChild(result);
+            }
+
+            content.appendChild(stepDiv);
+
+            document.getElementById('prevBtn').disabled = stepIndex === 0;
+            document.getElementById('nextBtn').disabled = stepIndex === steps.length - 1;
+        }
+
+        function changeStep(delta) {
+            currentStep = Math.max(0, Math.min(steps.length - 1, currentStep + delta));
+            renderStep(currentStep);
+        }
+
+        function resetDemo() {
+            currentStep = 0;
+            document.getElementById('setupSection').classList.remove('hidden');
+            document.getElementById('demoSection').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
