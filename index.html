@@ -10,25 +10,135 @@
         }
         body {
             font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 8px;
+            margin: 0;
+            padding: 0;
             background: #f5f5f5;
-            overflow-x: hidden;
             font-size: 13px;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         h1 {
             text-align: center;
             color: #333;
             font-size: 1.1em;
             margin: 8px 0;
+            flex-shrink: 0;
         }
         .setup-container {
             background: white;
             padding: 12px;
             border-radius: 6px;
-            margin-bottom: 10px;
+            margin: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            flex: 1;
+        }
+        #demoSection {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+        #demoSection:not(.hidden) {
+            display: flex;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 6px;
+            margin: 10px;
+            border-left: 3px solid #2196f3;
+            font-size: 0.8em;
+            flex-shrink: 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px;
+            flex-shrink: 0;
+        }
+        .controls button {
+            flex: 1;
+        }
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding: 0 10px 10px 10px;
+        }
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 0;
+            overflow: hidden;
+        }
+        .step-title {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        .step-desc {
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        .step-header {
+            padding: 10px;
+            flex-shrink: 0;
+        }
+        .graphs-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+            padding: 0 10px;
+        }
+        .graph-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 150px;
+            margin: 5px 0;
+        }
+        .graphs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+            min-width: fit-content;
+        }
+        .graphs-container.two-graphs {
+        }
+        .graphs-container.single-graph {
+        }
+        .graph-title {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+        .graph {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            min-height: 140px;
+            overflow: hidden;
+        }
+        .step-footer {
+            padding: 10px;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
         }
         .setup-title {
             font-size: 1em;
@@ -46,72 +156,38 @@
             color: #555;
             font-size: 0.85em;
         }
-        .input-group input, .input-group select {
+        .input-group input {
             width: 100%;
             padding: 6px;
             border: 2px solid #ddd;
             border-radius: 4px;
             font-size: 0.9em;
         }
-        .info-box {
-            background: #e3f2fd;
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            border-left: 3px solid #2196f3;
-            font-size: 0.8em;
-        }
-        .step-container {
-            background: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .step-title {
-            font-size: 0.95em;
-            font-weight: bold;
-            color: #1976d2;
-            margin-bottom: 8px;
-        }
-        .step-desc {
-            font-size: 0.8em;
-            margin-bottom: 10px;
-            min-height: 40px;
-        }
-        .calculation-fixed {
+        .overlay-results {
             position: absolute;
-            bottom: 60px;
-            left: 10px;
-            right: 10px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 2;
         }
-        .result-fixed {
+        .overlay-stem {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
+            width: 3px;
+            background: rgba(76, 175, 80, 0.4);
+            bottom: 70px;
+            z-index: 2;
         }
-        .graph-wrapper {
-            overflow-x: hidden;
-            overflow-y: visible;
-            margin: 10px 0;
-        }
-        .graph {
-            position: relative;
-            height: 140px;
-            margin: 15px 0;
-            width: 100%;
-        }
-        .graph.single-graph {
-            height: 295px;
-        }
-        .graph.mini-graph {
-            height: 80px;
-        }
-        .graph-title {
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .overlay-impulse {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid rgba(76, 175, 80, 0.6);
+            background: rgba(76, 175, 80, 0.2);
+            transform: translate(-50%, -50%);
+            z-index: 2;
         }
         .axis {
             position: absolute;
@@ -123,19 +199,13 @@
             right: 0;
             height: 2px;
         }
-        .axis-x.mini {
-            bottom: 40px;
-        }
         .axis-y {
             bottom: 0;
             left: 50%;
             width: 2px;
-            height: 140px;
+            height: 100%;
             background: #ff9800;
             z-index: 5;
-        }
-        .axis-y.mini {
-            height: 80px;
         }
         .axis-y-label {
             position: absolute;
@@ -151,9 +221,6 @@
             background: #2196f3;
             bottom: 70px;
             z-index: 3;
-        }
-        .stem.mini {
-            bottom: 40px;
         }
         .stem.flipped {
             background: #f44336;
@@ -184,19 +251,12 @@
             background: #666;
             bottom: 68px;
         }
-        .tick.mini {
-            bottom: 38px;
-        }
         .tick-label {
             position: absolute;
             bottom: 53px;
             font-size: 0.7em;
             color: #666;
             transform: translateX(-50%);
-        }
-        .tick-label.mini {
-            bottom: 23px;
-            font-size: 0.65em;
         }
         .impulse-value {
             position: absolute;
@@ -207,11 +267,11 @@
         }
         .mini-sequence {
             background: #f3e5f5;
-            padding: 8px;
+            padding: 6px;
             border-radius: 4px;
-            margin: 10px 0;
+            margin: 5px 0;
             font-family: 'Courier New', monospace;
-            font-size: 0.75em;
+            font-size: 0.7em;
             text-align: center;
             border-left: 3px solid #9c27b0;
         }
@@ -230,10 +290,6 @@
             margin-top: 8px;
             border-left: 3px solid #4caf50;
             font-size: 0.75em;
-        }
-        .controls {
-            text-align: center;
-            margin: 10px 0;
         }
         button {
             background: #2196f3;
@@ -306,8 +362,8 @@
         
         <div class="controls">
             <button id="prevBtn" onclick="changeStep(-1)">← Prev</button>
-            <button id="nextBtn" onclick="changeStep(1)">Next →</button>
             <button onclick="resetDemo()">Reset</button>
+            <button id="nextBtn" onclick="changeStep(1)">Next →</button>
         </div>
 
         <div id="content"></div>
@@ -381,7 +437,26 @@
             const minIdx = Math.min(...allIndices);
             const maxIdx = Math.max(...allIndices);
             const range = Math.max(Math.abs(minIdx), Math.abs(maxIdx)) + 3;
-            globalFixedRange = { min: -range, max: range };
+            
+            const allConvolutionResults = [];
+            for (let n = outputStart; n <= outputEnd; n++) {
+                let sum = 0;
+                for (let k = start1; k <= end1; k++) {
+                    const h_idx = n - k;
+                    if (h_idx >= start2 && h_idx <= end2) {
+                        const x_val = sig1[k - start1];
+                        const h_val = sig2[h_idx - start2];
+                        sum += x_val * h_val;
+                    }
+                }
+                allConvolutionResults.push(Math.abs(sum));
+            }
+            
+            const maxConvolutionVal = Math.max(...allConvolutionResults);
+            const maxSignalVal = Math.max(...sig1.map(v => Math.abs(v)), ...sig2.map(v => Math.abs(v)));
+            const globalMaxVal = Math.max(maxConvolutionVal, maxSignalVal);
+            
+            globalFixedRange = { min: -range, max: range, maxVal: globalMaxVal };
 
             steps.push({
                 title: "Step 0: Original Signals",
@@ -486,11 +561,7 @@
                             type: 'flipped'
                         }
                     ],
-                    miniGraph: {
-                        title: "Building y[n] (green)",
-                        bars: [...partialResults],
-                        type: 'result'
-                    },
+                    overlayResults: [...partialResults],
                     sequence: `y[n] so far: {${partialResults.map(p => p.val).join(', ')}}`,
                     calculation: calcText.length > 0 ? 
                         `y[${n}] = ${calcText.join(' + ')} = <span class='highlight'>${sum}</span>` :
@@ -511,7 +582,7 @@
             });
         }
 
-        function renderGraph(graph, container, globalRange, isSingleGraph = false, isMiniGraph = false) {
+        function renderGraph(graph, container, globalRange, isSingleGraph = false, overlayResults = null) {
             const wrapper = document.createElement('div');
             wrapper.className = 'graph-wrapper';
             
@@ -523,27 +594,23 @@
             }
 
             const graphDiv = document.createElement('div');
-            if (isSingleGraph) {
-                graphDiv.className = 'graph single-graph';
-            } else if (isMiniGraph) {
-                graphDiv.className = 'graph mini-graph';
-            } else {
-                graphDiv.className = 'graph';
-            }
+            graphDiv.className = 'graph';
 
             const minN = globalRange.min;
             const maxN = globalRange.max;
             const range = maxN - minN + 1;
             
-            const viewportWidth = Math.min(window.innerWidth - 30, 1170);
-            const spacing = viewportWidth / (range + 1);
+            const availableWidth = window.innerWidth - 60;
+            const minSpacing = 20;
+            const maxSpacing = 50;
+            let spacing = Math.max(minSpacing, Math.min(maxSpacing, availableWidth / (range + 1)));
 
             const axisX = document.createElement('div');
-            axisX.className = isMiniGraph ? 'axis axis-x mini' : 'axis axis-x';
+            axisX.className = 'axis axis-x';
             graphDiv.appendChild(axisX);
 
             const axisY = document.createElement('div');
-            axisY.className = isMiniGraph ? 'axis axis-y mini' : 'axis axis-y';
+            axisY.className = 'axis axis-y';
             axisY.style.left = ((0 - minN) * spacing + spacing/2) + 'px';
             const yLabel = document.createElement('div');
             yLabel.className = 'axis-y-label';
@@ -553,12 +620,12 @@
 
             for (let i = minN; i <= maxN; i++) {
                 const tick = document.createElement('div');
-                tick.className = isMiniGraph ? 'tick mini' : 'tick';
+                tick.className = 'tick';
                 tick.style.left = ((i - minN) * spacing + spacing/2) + 'px';
                 graphDiv.appendChild(tick);
 
                 const tickLabel = document.createElement('div');
-                tickLabel.className = isMiniGraph ? 'tick-label mini' : 'tick-label';
+                tickLabel.className = 'tick-label';
                 tickLabel.textContent = i;
                 tickLabel.style.left = ((i - minN) * spacing + spacing/2) + 'px';
                 graphDiv.appendChild(tickLabel);
@@ -568,18 +635,16 @@
 
             graph.bars.forEach(bar => {
                 const x = (bar.n - minN) * spacing + spacing/2;
-                const heightScale = isMiniGraph ? 20 : 50;
-                const height = Math.abs(bar.val) * (heightScale / maxVal);
-                const baseBottom = isMiniGraph ? 40 : 70;
+                const height = Math.abs(bar.val) * (50 / maxVal);
                 
                 const stem = document.createElement('div');
-                stem.className = isMiniGraph ? 'stem mini ' + graph.type : 'stem ' + graph.type;
+                stem.className = 'stem ' + graph.type;
                 stem.style.left = (x - 1) + 'px';
                 stem.style.height = height + 'px';
                 if (bar.val >= 0) {
-                    stem.style.bottom = baseBottom + 'px';
+                    stem.style.bottom = '70px';
                 } else {
-                    stem.style.bottom = (baseBottom - height) + 'px';
+                    stem.style.bottom = (70 - height) + 'px';
                 }
                 graphDiv.appendChild(stem);
 
@@ -587,25 +652,56 @@
                 impulse.className = 'impulse ' + graph.type;
                 impulse.style.left = x + 'px';
                 if (bar.val >= 0) {
-                    impulse.style.bottom = (baseBottom + height) + 'px';
+                    impulse.style.bottom = (70 + height) + 'px';
                 } else {
-                    impulse.style.bottom = (baseBottom - height) + 'px';
+                    impulse.style.bottom = (70 - height) + 'px';
                 }
                 graphDiv.appendChild(impulse);
 
-                if (!isMiniGraph) {
-                    const value = document.createElement('div');
-                    value.className = 'impulse-value';
-                    value.textContent = bar.val;
-                    value.style.left = x + 'px';
-                    if (bar.val >= 0) {
-                        value.style.bottom = (baseBottom + height + 10) + 'px';
-                    } else {
-                        value.style.bottom = (baseBottom - height - 15) + 'px';
-                    }
-                    graphDiv.appendChild(value);
+                const value = document.createElement('div');
+                value.className = 'impulse-value';
+                value.textContent = bar.val;
+                value.style.left = x + 'px';
+                if (bar.val >= 0) {
+                    value.style.bottom = (70 + height + 10) + 'px';
+                } else {
+                    value.style.bottom = (70 - height - 15) + 'px';
                 }
+                graphDiv.appendChild(value);
             });
+
+            if (overlayResults && overlayResults.length > 0) {
+                const overlayDiv = document.createElement('div');
+                overlayDiv.className = 'overlay-results';
+                
+                overlayResults.forEach(result => {
+                    const x = (result.n - minN) * spacing + spacing/2;
+                    const height = Math.abs(result.val) * (50 / maxVal);
+                    
+                    const stem = document.createElement('div');
+                    stem.className = 'overlay-stem';
+                    stem.style.left = (x - 1.5) + 'px';
+                    stem.style.height = height + 'px';
+                    if (result.val >= 0) {
+                        stem.style.bottom = '70px';
+                    } else {
+                        stem.style.bottom = (70 - height) + 'px';
+                    }
+                    overlayDiv.appendChild(stem);
+                    
+                    const impulse = document.createElement('div');
+                    impulse.className = 'overlay-impulse';
+                    impulse.style.left = x + 'px';
+                    if (result.val >= 0) {
+                        impulse.style.bottom = (70 + height) + 'px';
+                    } else {
+                        impulse.style.bottom = (70 - height) + 'px';
+                    }
+                    overlayDiv.appendChild(impulse);
+                });
+                
+                graphDiv.appendChild(overlayDiv);
+            }
 
             wrapper.appendChild(graphDiv);
             container.appendChild(wrapper);
@@ -618,57 +714,68 @@
 
             const stepDiv = document.createElement('div');
             stepDiv.className = 'step-container';
-            stepDiv.style.position = 'relative';
-            stepDiv.style.paddingBottom = '120px';
+
+            const stepHeader = document.createElement('div');
+            stepHeader.className = 'step-header';
 
             const title = document.createElement('div');
             title.className = 'step-title';
             title.textContent = step.title;
-            stepDiv.appendChild(title);
+            stepHeader.appendChild(title);
 
             const desc = document.createElement('div');
             desc.className = 'step-desc';
             desc.innerHTML = step.description;
-            stepDiv.appendChild(desc);
-
-            let allBars = [];
-            step.graphs.forEach(g => allBars = allBars.concat(g.bars));
-            
-            const minN = globalFixedRange.min;
-            const maxN = globalFixedRange.max;
-            
-            const maxVal = Math.max(...allBars.map(b => Math.abs(b.val)));
-            const globalRange = { min: minN, max: maxN, maxVal: maxVal };
-
-            const isSingleGraph = step.graphs.length === 1;
-            
-            step.graphs.forEach(graph => {
-                renderGraph(graph, stepDiv, globalRange, isSingleGraph);
-            });
-
-            if (step.miniGraph) {
-                renderGraph(step.miniGraph, stepDiv, globalRange, false, true);
-            }
+            stepHeader.appendChild(desc);
 
             if (step.sequence) {
                 const seq = document.createElement('div');
                 seq.className = 'mini-sequence';
                 seq.innerHTML = step.sequence;
-                stepDiv.appendChild(seq);
+                stepHeader.appendChild(seq);
             }
 
-            if (step.calculation) {
-                const calc = document.createElement('div');
-                calc.className = 'calculation calculation-fixed';
-                calc.innerHTML = '<strong>Calculation:</strong> ' + step.calculation;
-                stepDiv.appendChild(calc);
-            }
+            stepDiv.appendChild(stepHeader);
 
-            if (step.result) {
-                const result = document.createElement('div');
-                result.className = 'result-box result-fixed';
-                result.innerHTML = '<strong>Result:</strong> ' + step.result;
-                stepDiv.appendChild(result);
+            const graphsArea = document.createElement('div');
+            graphsArea.className = 'graphs-area';
+
+            const isSingleGraph = step.graphs.length === 1;
+            const graphsContainer = document.createElement('div');
+            graphsContainer.className = isSingleGraph ? 'graphs-container single-graph' : 'graphs-container two-graphs';
+
+            const minN = globalFixedRange.min;
+            const maxN = globalFixedRange.max;
+            const maxVal = globalFixedRange.maxVal;
+            const globalRange = { min: minN, max: maxN, maxVal: maxVal };
+
+            step.graphs.forEach((graph, index) => {
+                const overlayData = (index === 1 && step.overlayResults) ? step.overlayResults : null;
+                renderGraph(graph, graphsContainer, globalRange, isSingleGraph, overlayData);
+            });
+
+            graphsArea.appendChild(graphsContainer);
+            stepDiv.appendChild(graphsArea);
+
+            if (step.calculation || step.result) {
+                const stepFooter = document.createElement('div');
+                stepFooter.className = 'step-footer';
+
+                if (step.calculation) {
+                    const calc = document.createElement('div');
+                    calc.className = 'calculation';
+                    calc.innerHTML = '<strong>Calculation:</strong> ' + step.calculation;
+                    stepFooter.appendChild(calc);
+                }
+
+                if (step.result) {
+                    const result = document.createElement('div');
+                    result.className = 'result-box';
+                    result.innerHTML = '<strong>Result:</strong> ' + step.result;
+                    stepFooter.appendChild(result);
+                }
+
+                stepDiv.appendChild(stepFooter);
             }
 
             content.appendChild(stepDiv);
